@@ -6,7 +6,7 @@ services:
     container_name: research_dev_2
     ports: 
       - "80:3700"
-    enviroment:
+    environment:
       - PORT=3700
     volumes:
       - ./:/app
