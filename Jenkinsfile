@@ -5,8 +5,8 @@ pipeline{
     {
         DOCKERHUB_CREDENTIALS = 'cweb-2140-01'
 
-        //change this
-        IMAGE_NAME = 'schbros/researchanddev2:latest'
+        //change this to your dockerhub
+        IMAGE_NAME = 'schbros/Research_Dev_2:latest'
     }
 
     stages
@@ -29,9 +29,8 @@ pipeline{
                 script
                 {
                     echo "Building Docker image ${IMAGE_NAME}"
-                    app = Docker.build("${IMAGE_NAME}")                  
-                        app.tag("latest")
-                    
+                    app = Docker.build("${IMAGE_NAME}")
+                    app.tag("latest")
                 }
             }
         }
