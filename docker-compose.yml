@@ -3,7 +3,7 @@ services:
   snaketestapp:
     image: schbros/research_dev_2:latest
     build: .
-    contaianer_name: Research_Dev_2
+    contaianer_name: research_dev_2
     ports: 
       - "80:3700"
     enviroment:
