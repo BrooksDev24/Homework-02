@@ -6,7 +6,7 @@ pipeline{
         DOCKERHUB_CREDENTIALS = 'cweb-2140-01'
 
         //change this to your dockerhub
-        IMAGE_NAME = 'schbros/Research_Dev_2:latest'
+        IMAGE_NAME = 'schbros/research_dev_2:latest'
     }
 
     stages
