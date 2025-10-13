@@ -29,7 +29,7 @@ pipeline{
                 script
                 {
                     echo "Building Docker image ${IMAGE_NAME}"
-                    app = Docker.build("${IMAGE_NAME}")
+                    app = docker.build("${IMAGE_NAME}")
                     app.tag("latest")
                 }
             }
