@@ -1,9 +1,9 @@
 version: "3.8"
 services:
   snaketestapp:
-    image: schbros/research_dev_2:latest
+    image: schbros/chatappsonarpipe:latest
     build: .
-    container_name: research_dev_2
+    container_name: chatappsonarpipe
     ports: 
       - "80:3700"
     environment:
