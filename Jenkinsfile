@@ -6,7 +6,7 @@ pipeline{
         DOCKERHUB_CREDENTIALS = 'cweb-2140-01'
 
         //change this to your dockerhub
-        IMAGE_NAME = 'schbros/chatappsonarpipe:latest'
+        IMAGE_NAME = 'schbros/chatappsonarpipe'
     }
 
     stages
