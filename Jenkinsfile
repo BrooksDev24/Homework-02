@@ -35,6 +35,23 @@ pipeline{
                    }
               }
          }
+
+
+           stage('SonarQube Analysis') {
+            agent {
+                label 'CWEB-2040-01-app-server'
+            }
+            steps {
+                script {
+                    def scannerHome = tool 'SonarQube-Scanner'
+                    withSonarQubeEnv('SonarQube-Scanner') {
+                        sh "${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=NodeJSChatapp \
+                            -Dsonar.sources=."
+                    }
+                }
+            }
+        }
         
 
         stage('BUILD-AND-TAG')
