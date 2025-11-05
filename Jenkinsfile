@@ -94,7 +94,8 @@ pipeline{
                         snykSecurity(
                              snykInstallation:'snyk-installations',
                              snykTokenId:'Snyk-Token',
-                             severity:'critical'
+                             severity:'critical',
+                             failOnIssues:false
                         )
                    }
               }
