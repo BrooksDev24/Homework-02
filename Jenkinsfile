@@ -26,55 +26,7 @@ pipeline{
         }
 
 
-
-
-       stage("DAST Scan with OWASP ZAP") {
-            steps {
-                script {
-                    echo ' Running OWASP ZAP baseline scan...'
- 
-                    // Run ZAP baseline scan and capture exit code
-                    def exitCode = sh(script: '''
-                        docker run --rm --user root --network host -v $(pwd):/zap/wrk:rw \
-                        -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
-                        -t http://172.233.217.56 \
-                        -r zap_report.html -J zap_report.json
-                    ''', returnStatus: true)
- 
-                    echo "ZAP scan finished with exit code: ${exitCode}"
- 
-                    // Parse ZAP JSON report safely
-                    if (fileExists('zap_report.json')) {
-                        def zapContent = readFile('zap_report.json')
-                        def zapJson = new groovy.json.JsonSlurper().parseText(zapContent)
- 
-                        def highCount = 0
-                        def mediumCount = 0
-                        def lowCount = 0
- 
-                        zapJson.site.each { site ->
-                            site.alerts.each { alert ->
-                                switch (alert.risk) {
-                                    case 'High': highCount++; break
-                                    case 'Medium': mediumCount++; break
-                                    case 'Low': lowCount++; break
-                                }
-                            }
-                        }
- 
-                        echo "High severity issues: ${highCount}"
-                        echo "Medium severity issues: ${mediumCount}"
-                        echo "Low severity issues: ${lowCount}"
-                    } else {
-                        echo "ZAP JSON report not found, continuing build..."
-                    }
-                }
-            }
-       }
-
-
-        
-        stage("Check Docker Availability") {
+ stage("Check Docker Availability") {
             steps {
                 script {
                     echo ' Checking Docker installation...'
@@ -166,6 +118,54 @@ pipeline{
             }
         }
         }
+
+       stage("DAST Scan with OWASP ZAP") {
+            steps {
+                script {
+                    echo ' Running OWASP ZAP baseline scan...'
+ 
+                    // Run ZAP baseline scan and capture exit code
+                    def exitCode = sh(script: '''
+                        docker run --rm --user root --network host -v $(pwd):/zap/wrk:rw \
+                        -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
+                        -t http://172.233.217.56 \
+                        -r zap_report.html -J zap_report.json
+                    ''', returnStatus: true)
+ 
+                    echo "ZAP scan finished with exit code: ${exitCode}"
+ 
+                    // Parse ZAP JSON report safely
+                    if (fileExists('zap_report.json')) {
+                        def zapContent = readFile('zap_report.json')
+                        def zapJson = new groovy.json.JsonSlurper().parseText(zapContent)
+ 
+                        def highCount = 0
+                        def mediumCount = 0
+                        def lowCount = 0
+ 
+                        zapJson.site.each { site ->
+                            site.alerts.each { alert ->
+                                switch (alert.risk) {
+                                    case 'High': highCount++; break
+                                    case 'Medium': mediumCount++; break
+                                    case 'Low': lowCount++; break
+                                }
+                            }
+                        }
+ 
+                        echo "High severity issues: ${highCount}"
+                        echo "Medium severity issues: ${mediumCount}"
+                        echo "Low severity issues: ${lowCount}"
+                    } else {
+                        echo "ZAP JSON report not found, continuing build..."
+                    }
+                }
+            }
+       }
+
+
+        
+       
  
 
 
