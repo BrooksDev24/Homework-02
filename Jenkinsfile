@@ -173,21 +173,7 @@ pipeline{
         }
     }
  
-    post {
-        always {
-            echo ' Container Security Scan completed.'
- 
-            // Publish HTML report in Jenkins UI
-            publishHTML([
-                reportDir: '.',
-                reportFiles: 'trivy-report.html',
-                reportName: 'Trivy Vulnerability Report',
-                keepAll: true,
-                alwaysLinkToLastBuild: true,
-                allowMissing: true
-            ])
-        }
-    }
+
 
 
           stage("SCA-SAST-SNYK-TEST")
