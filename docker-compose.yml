@@ -3,7 +3,7 @@ services:
   snaketestapp:
     image: schbros/chatappsonarpipe:latest
     build: .
-    container_name: chatappsonarpipe
+    container_name: chatappzap
     ports: 
       - "80:3700"
     environment:
