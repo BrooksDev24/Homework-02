@@ -83,7 +83,7 @@ pipeline{
 
           stage("SCA-SAST-SNYK-TEST")
          {
-              agent anya
+              agent any
               steps 
               {
                    script
