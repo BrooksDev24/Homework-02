@@ -70,13 +70,6 @@ pipeline{
                     }
                 }
             }
-            post {
-                always {
-                    echo 'Archiving ZAP scan reports...'
-                    archiveArtifacts artifacts: 'zap_report.html,zap_report.json', allowEmptyArchive: true
-                }
-            }
-        }
 
 
         
