@@ -84,6 +84,7 @@ pipeline{
         }
 
 
+        catchError (buildResult: 'SUCCESS', stageResult: 'FAILURE') {
         stage("Check Docker Availability") {
             steps {
                 script {
@@ -171,7 +172,7 @@ pipeline{
                 }
             }
         }
-    
+        }
  
 
 
