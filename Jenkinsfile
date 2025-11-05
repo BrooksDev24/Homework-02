@@ -9,9 +9,7 @@ pipeline{
         IMAGE_NAME = 'schbros/chatappsonarpipe'
 
                 // ZAP vars can be here (global) or inside the ZAP stage
-        TARGET_URL  = "http://172.233.217.56/"
-        REPORT_HTML = "zap_report.html"
-        REPORT_JSON = "zap_report.json"
+
     }
 
     stages
@@ -79,21 +77,7 @@ pipeline{
                 }
             
  
-            post {
-                always {
-                    echo 'Archiving ZAP scan reports...'
-                    archiveArtifacts artifacts: 'zap_report.html,zap_report.json', allowEmptyArchive: true
- 
-                    publishHTML(target: [
-                        reportName: 'OWASP ZAP Report',
-                        reportDir: '.',
-                        reportFiles: 'zap_report.html',
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        allowMissing: true
-                    ])
-                }
-            }
+
         }
     }
 }
@@ -188,5 +172,4 @@ pipeline{
         }
         
     }
-
 
