@@ -21,6 +21,84 @@ pipeline{
 
 
 
+            environment {
+        TARGET_URL = "http://172.233.217.56/"
+        REPORT_HTML = "zap_report.html"
+        REPORT_JSON = "zap_report.json"
+    }
+ 
+    stages {
+        stage("DAST Scan with OWASP ZAP") {
+            steps {
+                script {
+                    echo 'Running OWASP ZAP baseline scan...'
+ 
+                    def dockerCheck = sh(script: "docker --version", returnStatus: true)
+                    if (dockerCheck != 0) {
+                        error "Docker is not installed or not accessible by Jenkins user."
+                    }
+ 
+                    def exitCode = sh(script: """
+                        docker run --rm --user root --network host \
+                        -v \$(pwd):/zap/wrk:rw \
+                        -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
+                        -t ${TARGET_URL} \
+                        -r ${REPORT_HTML} -J ${REPORT_JSON}
+                    """, returnStatus: true)
+ 
+                    echo "ZAP scan finished with exit code: ${exitCode}"
+ 
+                    if (fileExists(REPORT_JSON)) {
+                        def zapContent = readFile(REPORT_JSON)
+                        def zapJson = new groovy.json.JsonSlurper().parseText(zapContent)
+ 
+                        def highCount = 0
+                        def mediumCount = 0
+                        def lowCount = 0
+ 
+                        zapJson.site.each { site ->
+                            site.alerts.each { alert ->
+                                switch (alert.risk) {
+                                    case 'High': highCount++; break
+                                    case 'Medium': mediumCount++; break
+                                    case 'Low': lowCount++; break
+                                }
+                            }
+                        }
+ 
+                        echo "High severity issues: ${highCount}"
+                        echo "Medium severity issues: ${mediumCount}"
+                        echo "Low severity issues: ${lowCount}"
+ 
+                        if (highCount > 0 || mediumCount > 0) {
+                            currentBuild.result = 'UNSTABLE'
+                            echo "Build marked as UNSTABLE due to detected vulnerabilities."
+                        }
+                    } else {
+                        echo "ZAP JSON report not found, continuing build..."
+                    }
+                }
+            }
+ 
+            post {
+                always {
+                    echo 'Archiving ZAP scan reports...'
+                    archiveArtifacts artifacts: 'zap_report.html,zap_report.json', allowEmptyArchive: true
+ 
+                    publishHTML(target: [
+                        reportName: 'OWASP ZAP Report',
+                        reportDir: '.',
+                        reportFiles: 'zap_report.html',
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        allowMissing: true
+                    ])
+                }
+            }
+        }
+    }
+}
+
 
 
           stage("SCA-SAST-SNYK-TEST")
