@@ -7,6 +7,11 @@ pipeline{
 
         //change this to your dockerhub
         IMAGE_NAME = 'schbros/chatappsonarpipe'
+
+                // ZAP vars can be here (global) or inside the ZAP stage
+        TARGET_URL  = "http://172.233.217.56/"
+        REPORT_HTML = "zap_report.html"
+        REPORT_JSON = "zap_report.json"
     }
 
     stages
@@ -21,13 +26,7 @@ pipeline{
 
 
 
-            environment {
-        TARGET_URL = "http://172.233.217.56/"
-        REPORT_HTML = "zap_report.html"
-        REPORT_JSON = "zap_report.json"
-    }
- 
-    stages {
+
         stage("DAST Scan with OWASP ZAP") {
             steps {
                 script {
@@ -78,7 +77,7 @@ pipeline{
                         echo "ZAP JSON report not found, continuing build..."
                     }
                 }
-            }
+            
  
             post {
                 always {
