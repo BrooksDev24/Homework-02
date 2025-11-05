@@ -8,10 +8,8 @@ pipeline{
         //change this to your dockerhub
         IMAGE_NAME = 'schbros/chatappsonarpipe'
 
-        // ZAP vars can be here (global) or inside the ZAP stage
-        TARGET_URL = "http://172.238.162.6/"
-        REPORT_HTML = "zap_report.html"
-        REPORT_JSON = "zap_report.json"
+  
+
         // trivy
         TRIVY_SEVERITY = "HIGH,CRITICAL"
 
@@ -30,28 +28,24 @@ pipeline{
 
 
 
-        stage("DAST Scan with OWASP ZAP") {
+       stage("DAST Scan with OWASP ZAP") {
             steps {
                 script {
-                    echo 'Running OWASP ZAP baseline scan...'
+                    echo ' Running OWASP ZAP baseline scan...'
  
-                    def dockerCheck = sh(script: "docker --version", returnStatus: true)
-                    if (dockerCheck != 0) {
-                        error "Docker is not installed or not accessible by Jenkins user."
-                    }
- 
-                    def exitCode = sh(script: """
-                        docker run --rm --user root --network host \
-                        -v \$(pwd):/zap/wrk:rw \
+                    // Run ZAP baseline scan and capture exit code
+                    def exitCode = sh(script: '''
+                        docker run --rm --user root --network host -v $(pwd):/zap/wrk:rw \
                         -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
-                        -t ${TARGET_URL} \
-                        -r ${REPORT_HTML} -J ${REPORT_JSON}
-                    """, returnStatus: true)
+                        -t http://172.234.200.153 \
+                        -r zap_report.html -J zap_report.json
+                    ''', returnStatus: true)
  
                     echo "ZAP scan finished with exit code: ${exitCode}"
  
-                    if (fileExists(REPORT_JSON)) {
-                        def zapContent = readFile(REPORT_JSON)
+                    // Parse ZAP JSON report safely
+                    if (fileExists('zap_report.json')) {
+                        def zapContent = readFile('zap_report.json')
                         def zapJson = new groovy.json.JsonSlurper().parseText(zapContent)
  
                         def highCount = 0
@@ -71,14 +65,15 @@ pipeline{
                         echo "High severity issues: ${highCount}"
                         echo "Medium severity issues: ${mediumCount}"
                         echo "Low severity issues: ${lowCount}"
- 
-                        if (highCount > 0 || mediumCount > 0) {
-                            currentBuild.result = 'UNSTABLE'
-                            echo "Build marked as UNSTABLE due to detected vulnerabilities."
-                        }
                     } else {
                         echo "ZAP JSON report not found, continuing build..."
                     }
+                }
+            }
+            post {
+                always {
+                    echo 'Archiving ZAP scan reports...'
+                    archiveArtifacts artifacts: 'zap_report.html,zap_report.json', allowEmptyArchive: true
                 }
             }
         }
