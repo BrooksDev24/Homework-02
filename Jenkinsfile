@@ -8,7 +8,10 @@ pipeline{
         //change this to your dockerhub
         IMAGE_NAME = 'schbros/chatappsonarpipe'
 
-                // ZAP vars can be here (global) or inside the ZAP stage
+        // ZAP vars can be here (global) or inside the ZAP stage
+        TARGET_URL = "http://172.238.162.6/"
+        REPORT_HTML = "zap_report.html"
+        REPORT_JSON = "zap_report.json"
 
     }
 
