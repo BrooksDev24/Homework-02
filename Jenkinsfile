@@ -75,18 +75,15 @@ pipeline{
                         echo "ZAP JSON report not found, continuing build..."
                     }
                 }
-            
- 
-
+            }
         }
-    }
-}
+
 
 
 
           stage("SCA-SAST-SNYK-TEST")
          {
-              agent any
+              agent anya
               steps 
               {
                    script
