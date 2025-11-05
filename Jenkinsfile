@@ -84,7 +84,7 @@ pipeline{
         }
 
 
-        catchError (buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+        
         stage("Check Docker Availability") {
             steps {
                 script {
@@ -107,9 +107,11 @@ pipeline{
             }
         }
  
+ 
         stage("Container Vulnerability Scan (Trivy)") {
             steps {
                 script {
+                    catchError (buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     echo " Scanning Docker image ${IMAGE_NAME} for vulnerabilities..."
  
                     // JSON report
@@ -131,6 +133,7 @@ pipeline{
                         --output /workspace/trivy-report.html \
                         ${IMAGE_NAME}
                     """
+                    }
                 }
             }
             post {
@@ -143,6 +146,7 @@ pipeline{
  
         stage("Summarize Vulnerabilities") {
             steps {
+                catchError (buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 script {
                     if (fileExists('trivy-report.json')) {
                         def reportContent = readFile('trivy-report.json')
